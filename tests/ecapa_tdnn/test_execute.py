@@ -26,7 +26,7 @@ def test_ecapa_tdnn_execute():
     )
     
     wave_data, _ = load_wave(TEST_AUDIO_FILE, sample_rate=SAMPLE_RATE, is_torch=True, mono=False)
-    for time_index_num in [9, 49, 99]:
+    for time_index_num in [9, 49, 99, 380]:
         x = wave_data[:, :int(HOP_LENGTH*time_index_num)]
         x = preprocesser(x)
         _, _, time_index = x.size()

@@ -4,7 +4,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 class PreEmphasis(torch.nn.Module):
-
+    """
+    高周波を強調し、低周波のamplitudeを小さくする
+    y_t = x_t - conf * x_{t-1}
+    """
     def __init__(self, coef: float = 0.97):
         super().__init__()
         self.coef = coef
@@ -18,6 +21,8 @@ class PreEmphasis(torch.nn.Module):
         return F.conv1d(input, self.flipped_filter).squeeze(1)
 
 class Wave2MelSpecPreprocess(nn.Module):
+    """波形データに対する前処理
+    """
     def __init__(
         self, 
         sample_rate=16000, 
@@ -36,7 +41,14 @@ class Wave2MelSpecPreprocess(nn.Module):
                                                  f_min = f_min, f_max = f_max, window_fn=torch.hamming_window, n_mels=n_mels),
             )
     
-    def forward(self, x):
+    def forward(self, x: torch.tensor) -> torch.tensor:
+        """
+        Args:
+            x (torch.tensor): 音声波形データ (batch_size, frame_size)
+
+        Returns:
+            torch.tensor: 前処理の結果 (batch_size, channel_size:n_mels, 変換後のframe_size)
+        """
         with torch.no_grad():
             x = self.torchfbank(x)
             x = x - torch.mean(x, dim=-1, keepdim=True)

@@ -85,11 +85,13 @@ class Bottle2neck(nn.Module):
 class ECAPA_TDNN(nn.Module):
 
     def __init__(self, channel_size=1000, hidden_size=64):
+        """
+        Args:
+            channel_size (int): channel size. Defaults to 1000.
+            hidden_size (int): output hidden size. Defaults to 64.
+        """
 
         super(ECAPA_TDNN, self).__init__()
-
-       
-
         self.conv1  = nn.Conv1d(80, channel_size, kernel_size=5, stride=1, padding=2)
         self.relu   = nn.ReLU()
         self.bn1    = nn.BatchNorm1d(channel_size)
@@ -112,7 +114,14 @@ class ECAPA_TDNN(nn.Module):
         self.fc7 = nn.Linear(hidden_size, hidden_size)
         self.bn7 = nn.BatchNorm1d(hidden_size)
 
-    def vecterize(self, x):
+    def vecterize(self, x: torch.Tensor) -> torch.Tensor:
+        """音声から特徴抽出 (time_indexは、可変でOK)
+        Args:
+            x (torch.Tensor): メルスペクトロうグラム (batch_size, n_mels, time_index)
+
+        Returns:
+            torch.Tensor: 特徴ベクトル (batch_size, hidden_size)
+        """
         x = self.conv1(x)
         x = self.relu(x)
         x = self.bn1(x)
@@ -131,9 +140,9 @@ class ECAPA_TDNN(nn.Module):
         w = self.attention(global_x)
 
         mu = torch.sum(x * w, dim=2)
-        sg = torch.sqrt( ( torch.sum((x**2) * w, dim=2) - mu**2 ).clamp(min=1e-4) )
+        sg = torch.sqrt((torch.sum((x**2) * w, dim=2) - mu**2).clamp(min=1e-4))
 
-        x = torch.cat((mu,sg),1)
+        x = torch.cat((mu,sg), 1)
         x = self.bn5(x)
         x = self.fc6(x)
         x = self.bn6(x)
