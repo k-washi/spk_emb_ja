@@ -1,0 +1,5 @@
+dataset_list: ["/data/jvs_vc"] 
+# dataset_list: ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/voxceleb1_dev", "/data/voxceleb2_dev"]
+
+musan_dir_path: /data/musan
+riris_noise_dir_path: /data/riris_noises
