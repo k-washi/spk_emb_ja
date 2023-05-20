@@ -7,11 +7,12 @@ services:
     image: spk-emb-dev-image
     shm_size: '24gb'
     tty: true
-    volumes: 
+    volumes:
+      - /data/audio:/data
       - $PWD:/workspace
     command: '/bin/bash'
     ports:
-      - 18081-18090:18081-18090
+      - 18381-18390:18381-18390
     deploy:
       resources:
         reservations:
