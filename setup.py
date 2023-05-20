@@ -39,9 +39,9 @@ install_requires = reqs("requirements.txt")
 print(install_requires)
 
 setup(
-    name="ml_exp",
+    name="spk_emb_ja",
     version=find_version("src", "__init__.py"),
-    description="ml exp",
+    description="spk embedding trained by ja spk dataset",
     author="Kai Washizaki",
     author_email="bandad.kw@gmail.com",
     long_description=LONG_DESC,

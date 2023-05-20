@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  ml-dev:
+  spk-emb-dev:
     build: .
-    container_name: ml-dev
-    image: ml-dev-image
+    container_name: spk-emb-dev
+    image: spk-emb-dev-image
     shm_size: '24gb'
     tty: true
     volumes: 

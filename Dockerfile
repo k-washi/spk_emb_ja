@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.7.1-cudnn8-devel-ubuntu22.04
+FROM nvidia/cuda:11.8-cudnn8-devel-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && apt-get install -y build-essential vim \
     wget curl git zip gcc make cmake openssl \
@@ -13,7 +13,7 @@ ENV PYENV_ROOT $HOME/.pyenv
 ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 RUN pyenv --version
 
-RUN pyenv install 3.10.7
-RUN pyenv global 3.10.7
+RUN pyenv install 3.10.11
+RUN pyenv global 3.10.11
 
 WORKDIR /workspace
