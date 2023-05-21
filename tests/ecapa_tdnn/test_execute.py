@@ -1,6 +1,7 @@
 import torch
 from src.ecapa_tdnn import ECAPA_TDNN, Wave2MelSpecPreprocess
 from src.utils.audio import load_wave
+from src.utils.augment import FbankMaskAug
 
 
 TEST_AUDIO_FILE = "tests/__example/test.wav"
@@ -25,10 +26,13 @@ def test_ecapa_tdnn_execute():
         hidden_size=HIDDEN_SIZE
     )
     
+    fbank_aug = FbankMaskAug()
+    
     wave_data, _ = load_wave(TEST_AUDIO_FILE, sample_rate=SAMPLE_RATE, is_torch=True, mono=False)
     for time_index_num in [9, 49, 99, 380]:
         x = wave_data[:, :int(HOP_LENGTH*time_index_num)]
         x = preprocesser(x)
+        x = fbank_aug(x)
         _, _, time_index = x.size()
         assert time_index == time_index_num+1, f"preprocess error"
         

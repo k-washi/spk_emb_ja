@@ -1,0 +1,11 @@
+preprocess:
+  n_fft: 512
+  win_length: 400
+  hop_length: 160
+  f_min: 20
+  f_max: 7600
+  n_mels: 80
+
+ecapa_tdnn:
+  channel_size: 1024
+  hidden_size: 64

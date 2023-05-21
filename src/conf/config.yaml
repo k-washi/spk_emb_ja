@@ -2,6 +2,7 @@ defaults:
   - _self_
   - ml: default
   - dataset: default
+  - model: default
 
 hydra:
   run:
