@@ -12,6 +12,23 @@ source .venv/bin/activate
 pip install -e .
 ```
 
+実験実行例
+
+```
+python ./pipeline/train/exp002.py
+```
+
+# データ形式
+
+```
+    音声データセットdir
+     |-spk1
+     |  |-wav
+           |-audio_file_00001.wav
+           |-audio_file_00002.wav
+```
+
+
 # tesnsorboard
 
 ```
