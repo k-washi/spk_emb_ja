@@ -133,7 +133,7 @@ class EcapaTdnnModelModule(LightningModule):
                 self._labels.append(k)
                 emb_21, emb_22 = emb_11, emb_12
         try:
-            tunedThreshold, eer, fpr, fnr = tuneThresholdfromScore(self._scores, self._labels, [1, 0.1])[1]
+            eer = tuneThresholdfromScore(self._scores, self._labels, [1, 0.1])[1]
         except Exception as e:
             logger.error(e)
             logger.error(traceback.format_exc())
