@@ -1,13 +1,57 @@
 seed: 3407
 
+num_epochs: 10
 batch_size: 32
-learning_rate: 0.001
-optimizer: AdamW
+learning_rate: 0.005
+accumulate_grad_batches: 1
+warmup_steps: 2
+
+mix_precision: 32
+gpu_devices: 1
+profiler: simple
+
+model_save:
+  top_k: 3
+  monitor: train_acc
+  mode: min
+
+# scheduler
+scheduler:
+  mode: min
+  # CosineLRScheduler
+  t_initial: 5 # 1 cycle epochs
+  t_mul: 1
+  decay_rate: 0.75
+  monitor: train_loss
+  warm_up_init: 1e-4
+  warm_up_t: 2
+  warmup_prefix: True
+
+dataloader:
+  num_workers: 12
 
 loss:
   type: aam # [aam, ce]
   use_ce_weight: true
+  aam:
+    margin: 0.2
+    scale: 30
 
-aam:
-  margin: 0.2
-  scale: 30
+optimizer:
+  type: adan # : [adan, adamw]
+  weight_decay: 0.02 # weight decay, similar one used in AdamW (default: 0.02)
+  opt_eps: 1e-8 # optimizer epsilon to avoid the bad case where second-order moment is zero (default: None, use opt default 1e-8 in adan)
+  adan:
+    # https://github.com/sail-sg/Adan
+    max_grad_norm: 5.0 # if the l2 norm is large than this hyper-parameter, then we clip the gradient  (default: 0.0, no gradient clip)'
+    opt_betas: [0.98, 0.92, 0.99]  # optimizer betas in Adan (default: None, use opt default [0.98, 0.92, 0.99] in Adan)
+    no_prox: false # whether perform weight decay like AdamW (default=False)
+    fused: false
+
+
+# callback
+early_stopping:
+  use: True
+  monitor: train_acc
+  mode: min
+  patience: 5

@@ -7,7 +7,7 @@ from typing import Tuple, Union, List, Dict
 class SpkAttribute:
     data_num: int
 
-def collect_dataset_from_dataset_list(dataset_dir_list:List[Union[str, Path]], spk_index_info_json_output_path: str) -> Tuple[int, str]:
+def collect_dataset_from_dataset_list(dataset_dir_list:List[Union[str, Path]], spk_index_info_json_output_path: str) -> List[Tuple[int, str]]:
     """データセットのディレクトリ群から、audioファイルを集めて、(ラベル, ファイルパス)のリストを作成
     
     Args:
@@ -15,7 +15,7 @@ def collect_dataset_from_dataset_list(dataset_dir_list:List[Union[str, Path]], s
         spk_index_info_json_output_path (str): {spk_name: label_index}のjsonを作成市保存するパス
 
     Returns:
-        Tuple[int, str]: (ラベル, ファイルパス)のリスト
+        List[Tuple[int, str]]: (ラベル, ファイルパス)のリスト
     """
     spk_attr_dic, spk_index_info, tmp_dataset_list, dataset_list = {}, {}, [], []
     for dataset_dir in dataset_dir_list:

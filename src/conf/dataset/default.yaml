@@ -3,7 +3,7 @@ train:
   # dataset_list: ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/voxceleb1_dev", "/data/voxceleb2_dev"]
   spk_index_info_json_path: results/train_spk_index_info.json
 test:
-  dataset_list: ["/data/spkemb_test_dataset", "/data/voxceleb2_test"]
+  dataset_list: ["/data/spkemb_test_dataset"]
   spk_index_info_json_path: results/test_spk_index_info.json
 
 
@@ -13,7 +13,7 @@ audio:
 
 augment:
   musan_dir_path: /data/musan
-  riris_noise_dir_path: /data/riris_noises
+  rir_dir_path: /data/riris_noises
   time_stretch_params: [0.8, 1.2, 0.5]
   freq_mask_width: [0, 8]
   time_mask_width: [0, 10]

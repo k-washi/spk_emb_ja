@@ -61,7 +61,7 @@ class VoiceDataset(Dataset):
         # データ拡張
         if self.is_aug:
             waveform = self._augment(waveform)
-        return torch.FloatTensor(waveform[0]), label
+        return torch.FloatTensor(waveform[0]), label, audio_file
     
     def __aug_setup(self, musan_path, rir_path, time_stretch_params):
         if not self.is_aug:
@@ -144,6 +144,6 @@ if __name__ == "__main__":
     
     Path("./results/test_audio").mkdir(parents=True, exist_ok=True)
     for i in range(10):
-        waveform, label = dataset[0]
-        print(waveform.shape, label)
+        waveform, label, audio_file = dataset[0]
+        print(waveform.shape, label, audio_file)
         save_wave(waveform, f"./results/test_audio/dataset_sample_{i:05d}.wav")
