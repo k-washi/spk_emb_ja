@@ -47,8 +47,8 @@ class VoiceDataModule(LightningDataModule):
         logger.info(f"Train Dataset Size: {len(dataset)}")
         
         #@reference: https://pytorch.org/docs/stable/notes/randomness.html
-        g = torch.Generator()
-        g.manual_seed(0)
+        # g = torch.Generator()
+        # g.manual_seed(0)
     
         return DataLoader(
             dataset,
@@ -57,8 +57,7 @@ class VoiceDataModule(LightningDataModule):
             shuffle=True,
             num_workers=self._num_workers,
             pin_memory=True,
-            worker_init_fn=seed_worker,
-            generator=g
+            worker_init_fn=seed_worker
         )
         
     def val_dataloader(self) -> EVAL_DATALOADERS:

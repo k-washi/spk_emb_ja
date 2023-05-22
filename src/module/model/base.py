@@ -2,6 +2,7 @@ import traceback
 import torch
 import torch.nn.functional as F
 import numpy as np
+import gc
 from pytorch_lightning import LightningModule
 from timm.scheduler import CosineLRScheduler
 from torch import nn
@@ -145,9 +146,10 @@ class EcapaTdnnModelModule(LightningModule):
         self.log('val_minDCF', minDCF, on_step=False,on_epoch=True, logger=True)
         
         # clear
-        self._scores.clear()
-        self._labels.clear()
-        self._embeddings.clear()
+        del self._scores
+        del self._labels
+        del self._embeddings
+        gc.collect()
     
     def configure_optimizers(self):
         no_decay = ["bias", "LayerNorm.weight"]

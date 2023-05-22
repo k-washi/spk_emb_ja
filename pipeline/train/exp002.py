@@ -18,23 +18,23 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00001"
+EXP_ID = "00002"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
 
-TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
-#TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/voxceleb1_dev", "/data/voxceleb2_dev"]
+#TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
+TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset"]
 
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
 # TRAIN PARAMS
-NUM_EPOCHS = 10
+NUM_EPOCHS = 30
 BATCH_SIZE = 64
 SCHEDULER_T_INITIAL = 10
 
 # MODEL PARAMS
-HIDDEN_SIZE = 256
+HIDDEN_SIZE = 64
 
 LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}"
 
@@ -49,7 +49,7 @@ config_path = Path(__file__).resolve().parent.parent.parent / "src/conf"
 @hydra.main(version_base=None, config_path=str(config_path), config_name="config")
 def train(cfg: DictConfig):
     cfg.dataset.train.dataset_list = TRAIN_DATASET_LIST
-    cfg.dataset.test.dataset_list = TRAIN_DATASET_LIST
+    
     cfg.ml.num_epochs = NUM_EPOCHS
     cfg.ml.batch_size = BATCH_SIZE
     cfg.ml.scheduler.t_initial = SCHEDULER_T_INITIAL

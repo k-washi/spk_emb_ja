@@ -54,8 +54,14 @@ def get_audio_file_num_by_spk_index(audio_file_list:List) -> Dict[int, int]:
         else:
             audio_file_num_by_spk[label] += 1
     audio_file_num_by_spk_list = [0] * len(audio_file_num_by_spk)
-    for k, v in audio_file_num_by_spk.items():
-        audio_file_num_by_spk_list[k] = v
+    try:
+        for k, v in audio_file_num_by_spk.items():
+            audio_file_num_by_spk_list[k] = v
+    except Exception as e:
+        print(k)
+        print(v)
+        raise ValueError(e)
+    
     return audio_file_num_by_spk_list
     
     
@@ -86,7 +92,7 @@ def collect_audio_files_from_dataset(dataset_dir_path:Union[str, Path]) -> Tuple
         spk_name = spk_dir.stem
         spk_dir = spk_dir / "wav"
         audio_file_list = sorted(list(spk_dir.glob("*.wav")) + list(spk_dir.glob("*.mp3")))
-        
+        assert len(audio_file_list) > 0, f"{spk_name}の音声ファイルが見つかりませんでした。"
         attr_dic[spk_name] = SpkAttribute(len(audio_file_list))
         for audio_file_path in audio_file_list:
             dataset_list.append((spk_name, str(audio_file_path)))
