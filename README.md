@@ -17,7 +17,7 @@ pip install -e .
 adan optimizerを使用する場合は、以下もダウンロードする。
 
 ```
-adan @ git+https://github.com/sail-sg/Adan.git@8362d90a8f8f9c9315177d193c24094b1a610308
+pip install git+https://github.com/sail-sg/Adan.git@8362d90a8f8f9c9315177d193c24094b1a610308
 ```
 
 実験実行例
