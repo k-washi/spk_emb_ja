@@ -18,7 +18,7 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00003"
+EXP_ID = "00004"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 

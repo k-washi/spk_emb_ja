@@ -6,7 +6,7 @@ import numpy as np
 import gc
 from pytorch_lightning import LightningModule
 from timm.scheduler import CosineLRScheduler
-from torch import nn
+import math
 
 # model
 from src.ecapa_tdnn.model import ECAPA_TDNN
@@ -61,6 +61,8 @@ class EcapaTdnnModelModule(LightningModule):
         self.sample_rate = cfg.dataset.audio.sample_rate
         self.waveform_length = cfg.dataset.audio.waveform_length
         self.hop_length = cfg.model.preprocess.hop_length
+        
+        self._num_epochs = cfg.ml.num_epochs
         self._batch_size = cfg.ml.batch_size
         
         self._learning_rate = cfg.ml.learning_rate
@@ -205,8 +207,10 @@ class EcapaTdnnModelModule(LightningModule):
         self.scheduler  = CosineLRScheduler(
             self.optimizer,
             t_initial=self._sh_params.t_initial,
+            lr_min=self._sh_params.lr_min,
             cycle_mul=self._sh_params.t_mul,
             cycle_decay=self._sh_params.decay_rate,
+            cycle_limit=math.ceil(self._num_epochs / self._sh_params.t_initial),
             warmup_t=self._sh_params.warm_up_t,
             warmup_lr_init=self._sh_params.warm_up_init,
             warmup_prefix=self._sh_params.warmup_prefix,

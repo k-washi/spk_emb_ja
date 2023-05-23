@@ -17,11 +17,12 @@ model_save:
 
 # scheduler
 scheduler:
+  lr_min: 1e-5
   mode: min
   # CosineLRSeduler
   t_initial: 10 # 1 cycle epochs
   t_mul: 1
-  decay_rate: 0.75
+  decay_rate: 0.25
   monitor: train_loss
   warm_up_init: 1e-4
   warm_up_t: 1
