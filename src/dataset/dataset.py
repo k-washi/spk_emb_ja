@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+import gc
 from pathlib import Path
 from typing import List, Tuple
 from torch.utils.data import Dataset
@@ -16,9 +17,11 @@ class VoiceDataset(Dataset):
                 sample_rate: int = 16000,
                 waveform_length: int = 32240, # 200 frame * 160 hop_length + 240
                 is_aug:bool = False,
+                use_noise=True,
                 musan_path: str = "/data/musan",
                 rir_path: str = "/data/riris_noises",
-                time_stretch_params: Tuple[float, float, float] = (0.8, 1.2, 0.5)
+                time_stretch_params: Tuple[float, float, float] = (0.8, 1.2, 0.5),
+                is_audio_file_only: bool = False,
         ):
         """音声とラベルと返すデータセット
         速度変化、ノイズ追加、リバーブ追加のデータ拡張
@@ -36,6 +39,8 @@ class VoiceDataset(Dataset):
         self.sample_rate = sample_rate
         self.waveform_length = waveform_length
         self.is_aug = is_aug
+        self.is_audio_file_only = is_audio_file_only
+        self.use_noise = use_noise
         
         self.__aug_setup(musan_path, rir_path, time_stretch_params)
     
@@ -44,6 +49,8 @@ class VoiceDataset(Dataset):
     
     def __getitem__(self, idx):
         label, audio_file = self.audio_file_list[idx]
+        if self.is_audio_file_only:
+            return 0, label, audio_file
         waveform, _ = load_wave(audio_file, sample_rate=self.sample_rate, is_torch=False, mono=True)
         
         # waveform aug (time stretch)
@@ -70,41 +77,53 @@ class VoiceDataset(Dataset):
             TimeStretch(min_rate=time_stretch_params[0], max_rate=time_stretch_params[1], p=time_stretch_params[2])
         ])
         
-        # Musan: Load and configure augmentation files
-        ################################
-        self.noisetypes = ['noise','speech','music']
-        self.noisesnr = {'noise':[0,15],'speech':[13,20],'music':[5,15]}
-        self.numnoise = {'noise':[1,1], 'speech':[3,8], 'music':[1,1]}
-        
-        ################################
-        self.noiselist = {}
-        augment_files = sorted(list(Path(musan_path).glob('*/*/*.wav')))
-        assert len(augment_files) > 0, f"No musan files found in {musan_path}"
-        for file in augment_files:
-            noise_type = file.parent.parent.stem
-            if noise_type not in self.noiselist:
-                self.noiselist[noise_type] = []
-            self.noiselist[noise_type].append(str(file))
+        if self.use_noise:
+            # Musan: Load and configure augmentation files
+            ################################
+            self.noisetypes = ['noise','speech','music']
+            self.noisesnr = {'noise':[0,15],'speech':[13,20],'music':[5,15]}
+            self.numnoise = {'noise':[1,1], 'speech':[3,8], 'music':[1,1]}
+            
+            ################################
+            self.noiselist = {}
+            augment_files = sorted(list(Path(musan_path).glob('*/*/*.wav')))
+            assert len(augment_files) > 0, f"No musan files found in {musan_path}"
+            for file in augment_files:
+                noise_type = file.parent.parent.stem
+                if noise_type not in self.noiselist:
+                    self.noiselist[noise_type] = []
+                self.noiselist[noise_type].append(str(file))
 
         # Rir files
         self.rir_filies = sorted(list(Path(rir_path).glob('*/*/*.wav')))
         assert len(self.rir_filies) > 0, f"No rir files found in {rir_path}"
         
     def _augment(self, waveform):
-        augtype = torch.randint(0, 6, (1, 1)).item()
-        if augtype == 0:
-            pass # original
-        elif augtype == 1:
-            waveform = self.__add_rev(waveform)
-        elif augtype == 2:
-            waveform = self.__add_noise(waveform, 'speech')
-        elif augtype == 3:
-            waveform = self.__add_noise(waveform, 'music')
-        elif augtype == 4:
-            waveform = self.__add_noise(waveform, 'noise')
-        elif augtype == 5:
-            waveform = self.__add_noise(waveform,'speech')
-            waveform = self.__add_noise(waveform, 'music')
+        if self.use_noise:
+            augtype = torch.randint(0, 6, (1, 1)).item()
+            if augtype == 0:
+                pass # original
+            elif augtype == 1:
+                waveform = self.__add_rev(waveform)
+            elif augtype == 2:
+                waveform = self.__add_noise(waveform, 'speech')
+            elif augtype == 3:
+                waveform = self.__add_noise(waveform, 'music')
+            elif augtype == 4:
+                waveform = self.__add_noise(waveform, 'noise')
+            elif augtype == 5:
+                waveform = self.__add_noise(waveform,'speech')
+                waveform = self.__add_noise(waveform, 'music')
+            else:
+                raise ValueError(f"Unknown noise type: {augtype}")
+        else:
+            augtype = torch.randint(0, 3, (1, 1)).item()
+            if augtype in  [0, 1]:
+                pass # original
+            elif augtype in [2]:
+                waveform = self.__add_rev(waveform)
+            else:
+                raise ValueError(f"Unknown noise type: {augtype}")
         return waveform
     
     def __add_rev(self, waveform):

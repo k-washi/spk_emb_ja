@@ -18,7 +18,7 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00002"
+EXP_ID = "00003"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
@@ -30,11 +30,11 @@ FAST_DEV_RUN = False # 確認用の実行を行うか
 
 # TRAIN PARAMS
 NUM_EPOCHS = 30
-BATCH_SIZE = 64
+BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
 
 # MODEL PARAMS
-HIDDEN_SIZE = 64
+HIDDEN_SIZE = 128
 
 LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}"
 

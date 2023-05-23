@@ -12,6 +12,7 @@ audio:
   sample_rate: 16000
 
 augment:
+  use_noise: false
   musan_dir_path: /data/musan
   rir_dir_path: /data/riris_noises
   time_stretch_params: [0.8, 1.2, 0.5]

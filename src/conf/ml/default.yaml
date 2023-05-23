@@ -2,7 +2,7 @@ seed: 3407
 
 num_epochs: 20
 batch_size: 32
-learning_rate: 0.001
+learning_rate: 0.005
 accumulate_grad_batches: 1
 warmup_steps: 2
 

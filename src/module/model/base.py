@@ -1,4 +1,5 @@
 import traceback
+from typing import Any, Optional
 import torch
 import torch.nn.functional as F
 import numpy as np
@@ -74,16 +75,23 @@ class EcapaTdnnModelModule(LightningModule):
     def forward(self, x):
         return self.model(x)
     
+    def on_train_batch_start(self, batch: Any, batch_idx: int) -> int | None:
+        self._preprocesser.eval()
+        self._fbank_mask_aug.eval()
+        return super().on_train_batch_start(batch, batch_idx)
+    
     def training_step(self, batch, batch_idx):
         audio, labels, _ = batch
         audio = self._preprocesser(audio)
-        audio = self._fbank_mask_aug(audio)
+        with torch.no_grad():
+            audio = self._fbank_mask_aug(audio)
         output = self.forward(audio)
         
         loss, output = self._loss(output, labels)
 
-        prec = accuracy(output.detach(), labels.detach(), topk=(1,))[0]
-        self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        with torch.no_grad():
+            prec = accuracy(output.detach(), labels.detach(), topk=(1,))[0]
+        self.log('train_loss', loss, on_step=True, on_epoch=False, prog_bar=True, logger=True)
         self.log('train_acc', prec, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
     

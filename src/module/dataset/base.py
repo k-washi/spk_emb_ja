@@ -22,6 +22,7 @@ class VoiceDataModule(LightningDataModule):
         self._sample_rate = cfg.dataset.audio.sample_rate
         self._waveform_length = cfg.dataset.audio.waveform_length
         
+        self._use_noise = cfg.dataset.augment.use_noise
         self._musan_path = cfg.dataset.augment.musan_dir_path
         self._rir_path = cfg.dataset.augment.rir_dir_path
         self._time_stretch_aug_params = cfg.dataset.augment.time_stretch_params
@@ -39,9 +40,11 @@ class VoiceDataModule(LightningDataModule):
             sample_rate=self._sample_rate,
             waveform_length=self._waveform_length,
             is_aug=True,
+            use_noise=self._use_noise,
             musan_path=self._musan_path,
             rir_path=self._rir_path,
             time_stretch_params=self._time_stretch_aug_params,
+            is_audio_file_only=False
         )
         
         logger.info(f"Train Dataset Size: {len(dataset)}")
@@ -65,7 +68,9 @@ class VoiceDataModule(LightningDataModule):
             self._val_audio_list,
             sample_rate=self._sample_rate,
             waveform_length=self._waveform_length,
-            is_aug=False
+            is_aug=False,
+            use_noise=self._use_noise,
+            is_audio_file_only=True
         )
         
         logger.info(f"Val Dataset Size: {len(dataset)}")
@@ -75,7 +80,7 @@ class VoiceDataModule(LightningDataModule):
             batch_size=self._batch_size,
             drop_last=False,
             shuffle=False,
-            num_workers=self._num_workers,
+            num_workers=1,
             pin_memory=True,
             worker_init_fn=seed_worker
         )
@@ -84,7 +89,9 @@ class VoiceDataModule(LightningDataModule):
             self._test_audio_list,
             sample_rate=self._sample_rate,
             waveform_length=self._waveform_length,
-            is_aug=False
+            is_aug=False,
+            use_noise=self._use_noise,
+            is_audio_file_only=True
         )
         
         logger.info(f"Test Dataset Size: {len(dataset)}")
@@ -94,7 +101,7 @@ class VoiceDataModule(LightningDataModule):
             batch_size=self._batch_size,
             drop_last=False,
             shuffle=False,
-            num_workers=self._num_workers,
+            num_workers=1,
             pin_memory=True,
             worker_init_fn=seed_worker
         )
