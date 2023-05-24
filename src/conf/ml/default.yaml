@@ -2,7 +2,7 @@ seed: 3407
 
 num_epochs: 20
 batch_size: 32
-learning_rate: 0.005
+learning_rate: 0.001
 accumulate_grad_batches: 1
 warmup_steps: 2
 
@@ -22,9 +22,9 @@ scheduler:
   # CosineLRSeduler
   t_initial: 10 # 1 cycle epochs
   t_mul: 1
-  decay_rate: 0.25
+  decay_rate: 0.5
   monitor: train_loss
-  warm_up_init: 1e-4
+  warm_up_init: 5e-5
   warm_up_t: 1
   warmup_prefix: True
 
