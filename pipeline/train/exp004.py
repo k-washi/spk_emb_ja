@@ -18,11 +18,11 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00007"
+EXP_ID = "00008"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
-PRETRAINED_MODEL = "/workspace/checkpoints/00006/checkpoint-epoch=0011-train_acc=19.3842.ckpt"
+PRETRAINED_MODEL = "/workspace/checkpoints/00007/checkpoint-epoch=0031-train_acc=39.4470.ckpt"
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 

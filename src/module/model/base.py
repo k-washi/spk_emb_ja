@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import gc
+import itertools
 from pytorch_lightning import LightningModule
 from timm.scheduler import CosineLRScheduler
 import math
@@ -131,7 +132,9 @@ class EcapaTdnnModelModule(LightningModule):
             self._embeddings[label].append([emb_1.detach().cpu(), emb_2.detach().cpu()])
         
     def on_validation_epoch_end(self) -> None:
+        min_audio_num_by_spk = 10**8
         for k, v in self._embeddings.items():
+            min_audio_num_by_spk = min(min_audio_num_by_spk, len(v))
             for i, (emb_11, emb_12) in enumerate(v):
                 if i == 0:
                     emb_21, emb_22 = emb_11, emb_12
@@ -141,8 +144,25 @@ class EcapaTdnnModelModule(LightningModule):
                 score = (score_1 + score_2) / 2
                 score = score.detach().cpu().numpy()
                 self._scores.append(score)
-                self._labels.append(k)
+                self._labels.append(1) # 1 is same label
                 emb_21, emb_22 = emb_11, emb_12
+        
+        # 異なる話者同士のembeddingを計算
+        for i in range(min_audio_num_by_spk):
+            embs = []
+            for k, v in self._embeddings.items():
+                embs.append(v[i])
+            embs_prod = itertools.permutations(embs, 2)
+            for emb_1, emb_2 in embs_prod:
+                emb_11, emb_12 = emb_1
+                emb_21, emb_22 = emb_2
+                score_1 = torch.mean(torch.matmul(emb_11, emb_21.T))
+                score_2 = torch.mean(torch.matmul(emb_12, emb_22.T))
+                score = (score_1 + score_2) / 2
+                score = score.detach().cpu().numpy()
+                self._scores.append(score)
+                self._labels.append(0) # 0 is other label
+        
         try:
             eer = tuneThresholdfromScore(self._scores, self._labels, [1, 0.1])[1]
         except Exception as e:
