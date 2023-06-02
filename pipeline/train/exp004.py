@@ -18,11 +18,11 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00008"
+EXP_ID = "00009"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
-PRETRAINED_MODEL = "/workspace/checkpoints/00007/checkpoint-epoch=0031-train_acc=39.4470.ckpt"
+PRETRAINED_MODEL = "/workspace/checkpoints/00008/checkpoint-epoch=0111-train_acc=67.6996-val-eer.ckpt"
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
@@ -31,9 +31,10 @@ TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc",
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
 # TRAIN PARAMS
-NUM_EPOCHS = 200
+NUM_EPOCHS = 500
 BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
+LEARNING_RATE = 0.0001
 
 AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
 
@@ -56,6 +57,7 @@ def train(cfg: DictConfig):
     
     cfg.ml.num_epochs = NUM_EPOCHS
     cfg.ml.batch_size = BATCH_SIZE
+    cfg.ml.learning_rate = LEARNING_RATE
     cfg.ml.scheduler.t_initial = SCHEDULER_T_INITIAL
     cfg.model.ecapa_tdnn.hidden_size = HIDDEN_SIZE
     cfg.dataset.augment.time_stretch_params = AUGMENT_TIME_STRETCH_PARAMS
