@@ -18,7 +18,7 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00009"
+EXP_ID = "00010"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
@@ -34,7 +34,7 @@ FAST_DEV_RUN = False # 確認用の実行を行うか
 NUM_EPOCHS = 500
 BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.0002
 
 AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
 

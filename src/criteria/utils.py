@@ -17,7 +17,7 @@ def get_loss(
     
     # ce weight create
     ce_weight = None
-    if use_ce_weight:
+    if use_ce_weight and len(audio_file_list) > 0:
         audio_file_num_by_spk_index = get_audio_file_num_by_spk_index(audio_file_list)
         assert len(audio_file_num_by_spk_index) == len(spk_index_info), \
             f"audio_file_num_by_spk_index: {len(audio_file_num_by_spk_index)} is not equal to number of spk_index_info: {len(spk_index_info)}"

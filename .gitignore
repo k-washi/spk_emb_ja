@@ -144,3 +144,4 @@ results/
 checkpoints/
 logs/
 nohup/
+speaker-emb-ja-ecapa-tdnn/
