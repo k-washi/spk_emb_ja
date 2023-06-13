@@ -18,7 +18,7 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00005"
+EXP_ID = "00021"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
@@ -29,14 +29,14 @@ TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc",
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
 # TRAIN PARAMS
-NUM_EPOCHS = 30
+NUM_EPOCHS = 1000
 BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
 
 AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
 
 # MODEL PARAMS
-HIDDEN_SIZE = 128
+HIDDEN_SIZE = 512
 
 LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}"
 
@@ -81,7 +81,7 @@ def train(cfg: DictConfig):
     # モデル保存
     checkpoint_callback = ModelCheckpoint(
         dirpath=MODEL_SAVE_DIR,
-        filename="checkpoint-{epoch:04d}-{train_acc:.4f}",
+        filename="checkpoint-{epoch:04d}-{val_eer:.4f}",
         save_top_k=cfg.ml.model_save.top_k,
         monitor=cfg.ml.model_save.monitor,
         mode=cfg.ml.model_save.mode

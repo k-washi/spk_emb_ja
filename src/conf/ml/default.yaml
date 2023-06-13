@@ -12,8 +12,8 @@ profiler: simple
 
 model_save:
   top_k: 20
-  monitor: train_acc
-  mode: max
+  monitor: val_eer
+  mode: min
 
 # scheduler
 scheduler:
@@ -53,6 +53,6 @@ optimizer:
 # callback
 early_stopping:
   use: false
-  monitor: train_acc
-  mode: max
+  monitor: val_eer
+  mode: min
   patience: 5

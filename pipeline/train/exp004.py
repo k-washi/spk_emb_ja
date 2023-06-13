@@ -39,7 +39,7 @@ LEARNING_RATE = 0.0002
 AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
 
 # MODEL PARAMS
-HIDDEN_SIZE = 128
+HIDDEN_SIZE = 512
 
 LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}"
 
@@ -85,7 +85,7 @@ def train(cfg: DictConfig):
     # モデル保存
     checkpoint_callback = ModelCheckpoint(
         dirpath=MODEL_SAVE_DIR,
-        filename="checkpoint-{epoch:04d}-{train_acc:.4f}",
+        filename="checkpoint-{epoch:04d}-{val_eer:.4f}",
         save_top_k=cfg.ml.model_save.top_k,
         monitor=cfg.ml.model_save.monitor,
         mode=cfg.ml.model_save.mode
