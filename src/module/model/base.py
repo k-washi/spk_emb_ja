@@ -31,7 +31,8 @@ class EcapaTdnnModelModule(LightningModule):
 
         self.model = ECAPA_TDNN(
             cfg.model.ecapa_tdnn.channel_size,
-            cfg.model.ecapa_tdnn.hidden_size
+            cfg.model.ecapa_tdnn.hidden_size,
+            use_layer7=cfg.model.ecapa_tdnn.use_layer7
         )
         
         self._preprocesser = Wave2MelSpecPreprocess(

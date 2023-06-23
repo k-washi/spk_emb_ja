@@ -9,3 +9,4 @@ preprocess:
 ecapa_tdnn:
   channel_size: 1024
   hidden_size: 64
+  use_layer7: true

@@ -84,7 +84,7 @@ class Bottle2neck(nn.Module):
     
 class ECAPA_TDNN(nn.Module):
 
-    def __init__(self, channel_size=1000, hidden_size=64):
+    def __init__(self, channel_size=1000, hidden_size=64, use_layer7=True):
         """
         Args:
             channel_size (int): channel size. Defaults to 1000.
@@ -111,8 +111,11 @@ class ECAPA_TDNN(nn.Module):
         self.bn5 = nn.BatchNorm1d(3072)
         self.fc6 = nn.Linear(3072, hidden_size)
         self.bn6 = nn.BatchNorm1d(hidden_size)
-        self.fc7 = nn.Linear(hidden_size, hidden_size)
-        self.bn7 = nn.BatchNorm1d(hidden_size)
+        
+        self._use_layer7 = use_layer7
+        if self._use_layer7:
+            self.fc7 = nn.Linear(hidden_size, hidden_size)
+            self.bn7 = nn.BatchNorm1d(hidden_size)
 
     def vecterize(self, x: torch.Tensor) -> torch.Tensor:
         """音声から特徴抽出 (time_indexは、可変でOK)
@@ -150,7 +153,8 @@ class ECAPA_TDNN(nn.Module):
     
     def forward(self, x):
         x = self.vecterize(x)
-        x = self.fc7(x)
-        x = self.bn7(x)
+        if self._use_layer7:
+            x = self.fc7(x)
+            x = self.bn7(x)
 
         return x
