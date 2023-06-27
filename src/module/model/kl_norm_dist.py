@@ -10,7 +10,7 @@ from timm.scheduler import CosineLRScheduler
 import math
 
 # model
-from src.ecapa_tdnn.model import ECAPA_TDNN
+from src.ecapa_tdnn.kl_model import ECAPA_TDNN_KL
 from src.ecapa_tdnn.preprocess import Wave2MelSpecPreprocess
 from src.utils.augment import FbankMaskAug
 
@@ -25,15 +25,16 @@ from src.utils.logger import get_logger
 
 logger = get_logger(debug=True)
 
-class EcapaTdnnModelModule(LightningModule):
+class EcapaTdnnKLModelModule(LightningModule):
     def __init__(self, cfg, train_audio_file_list=[]):
-        super(EcapaTdnnModelModule, self).__init__()
+        super(EcapaTdnnKLModelModule, self).__init__()
 
-        self.model = ECAPA_TDNN(
+        self.model = ECAPA_TDNN_KL(
             cfg.model.ecapa_tdnn.channel_size,
             cfg.model.ecapa_tdnn.hidden_size,
             use_layer7=cfg.model.ecapa_tdnn.use_layer7
         )
+        self.kl_loss_beta = cfg.model.ecapa_tdnn.kl_beta
         
         self._preprocesser = Wave2MelSpecPreprocess(
             sample_rate=cfg.dataset.audio.sample_rate,
@@ -89,14 +90,18 @@ class EcapaTdnnModelModule(LightningModule):
         audio = self._preprocesser(audio)
         with torch.no_grad():
             audio = self._fbank_mask_aug(audio)
-        output = self.forward(audio)
+        feat, mu, logvar = self.forward(audio)
+        loss = 0
+        loss_clasification, output = self._loss(feat, labels)
+        kl_loss = self.model.kl_loss_of_normal_distribution(mu, logvar, beta=self.kl_loss_beta)
+        loss = loss_clasification +  kl_loss
         
-        loss, output = self._loss(output, labels)
-
         with torch.no_grad():
-            prec = accuracy(output.detach(), labels.detach(), topk=(1,))[0]
+            prec = accuracy(feat.detach(), labels.detach(), topk=(1,))[0]
         self.log('train_loss', loss, on_step=True, on_epoch=False, prog_bar=True, logger=True)
         self.log('train_acc', prec, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_cls_loss', loss_clasification, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log('train_kl_loss', kl_loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return loss
     
     def on_validation_epoch_start(self) -> None:
@@ -123,10 +128,10 @@ class EcapaTdnnModelModule(LightningModule):
             data_2 = torch.FloatTensor(feats).to(self.device)
             with torch.no_grad():
                 emb_1 = self._preprocesser(data_1)
-                emb_1 = self.model.vecterize(emb_1)
+                emb_1 = self.model.vectorize(emb_1)
                 emb_1 = F.normalize(emb_1, p=2, dim=1)
                 emb_2 = self._preprocesser(data_2)
-                emb_2 = self.model.vecterize(emb_2)
+                emb_2 = self.model.vectorize(emb_2)
                 emb_2 = F.normalize(emb_2, p=2, dim=1)
             if label not in self._embeddings:
                 self._embeddings[label] = []

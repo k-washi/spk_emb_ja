@@ -51,7 +51,18 @@ class VoiceDataset(Dataset):
         label, audio_file = self.audio_file_list[idx]
         if self.is_audio_file_only:
             return 0, label, audio_file
-        waveform, _ = load_wave(audio_file, sample_rate=self.sample_rate, is_torch=False, mono=True)
+        
+        add_index = 1
+        while True:
+            try:
+                label, audio_file = self.audio_file_list[idx]
+                waveform, _ = load_wave(audio_file, sample_rate=self.sample_rate, is_torch=False, mono=True)
+                break
+            except Exception as e:
+                print(e)
+                idx = int((idx + add_index) % len(self.audio_file_list))
+                add_index += 1
+                continue
         
         # waveform aug (time stretch)
         if self.is_aug:

@@ -102,6 +102,7 @@ def train(cfg: DictConfig):
     device = "gpu" if torch.cuda.is_available() else "cpu"
     trainer = Trainer(
             precision=cfg.ml.mix_precision,
+            gradient_clip_val=cfg.ml.gradient_clip_val,
             accelerator=device,
             devices=cfg.ml.gpu_devices,
             max_epochs=cfg.ml.num_epochs,

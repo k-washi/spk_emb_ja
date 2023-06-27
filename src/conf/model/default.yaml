@@ -10,3 +10,4 @@ ecapa_tdnn:
   channel_size: 1024
   hidden_size: 64
   use_layer7: true
+  kl_beta: 0.5

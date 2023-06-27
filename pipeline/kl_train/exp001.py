@@ -7,7 +7,7 @@ from pytorch_lightning.callbacks import LearningRateMonitor, ModelCheckpoint
 from pytorch_lightning.loggers import TensorBoardLogger
 
 from src.module.dataset.base import VoiceDataModule
-from src.module.model.base import EcapaTdnnModelModule
+from src.module.model.kl_norm_dist import EcapaTdnnKLModelModule
 
 from src.dataset.utils import collect_dataset_from_dataset_list
 
@@ -18,9 +18,9 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00022"
-LOG_SAVE_DIR = f"logs/{EXP_ID}"
-MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
+EXP_ID = "0023"
+LOG_SAVE_DIR = f"logs/kl_{EXP_ID}"
+MODEL_SAVE_DIR = f"checkpoints/kl_{EXP_ID}"
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
@@ -36,10 +36,10 @@ SCHEDULER_T_INITIAL = 10
 AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
 
 # MODEL PARAMS
-HIDDEN_SIZE = 512
-USE_LAYER_7 = False
+HIDDEN_SIZE = 128
+USE_LAYER_7 = True
 
-LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}"
+LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}_kl"
 if not USE_LAYER_7:
     LOG_NAME = LOG_NAME + "_no_layer7"
 
@@ -74,7 +74,7 @@ def train(cfg: DictConfig):
         cfg.dataset.test.dataset_list, cfg.dataset.test.spk_index_info_json_path
     )
     dataset = VoiceDataModule(cfg, _train_audio_list, _test_audio_list)
-    model = EcapaTdnnModelModule(cfg, _train_audio_list)
+    model = EcapaTdnnKLModelModule(cfg, _train_audio_list)
     
     ################################
     # コールバックなど訓練に必要な設定
@@ -109,6 +109,7 @@ def train(cfg: DictConfig):
     device = "gpu" if torch.cuda.is_available() else "cpu"
     trainer = Trainer(
             precision=cfg.ml.mix_precision,
+            gradient_clip_val=cfg.ml.gradient_clip_val,
             accelerator=device,
             devices=cfg.ml.gpu_devices,
             max_epochs=cfg.ml.num_epochs,

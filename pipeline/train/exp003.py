@@ -18,13 +18,13 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "00021"
+EXP_ID = "00025"
 LOG_SAVE_DIR = f"logs/{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/{EXP_ID}"
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
-TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset"]
+TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/jtube"]
 
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
@@ -33,7 +33,7 @@ NUM_EPOCHS = 1000
 BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
 
-AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
+AUGMENT_TIME_STRETCH_PARAMS = [0.975, 1.025, 0.5]
 
 # MODEL PARAMS
 HIDDEN_SIZE = 512
@@ -105,6 +105,7 @@ def train(cfg: DictConfig):
     device = "gpu" if torch.cuda.is_available() else "cpu"
     trainer = Trainer(
             precision=cfg.ml.mix_precision,
+            gradient_clip_val=cfg.ml.gradient_clip_val,
             accelerator=device,
             devices=cfg.ml.gpu_devices,
             max_epochs=cfg.ml.num_epochs,

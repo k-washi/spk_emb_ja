@@ -6,7 +6,8 @@ learning_rate: 0.0002
 accumulate_grad_batches: 1
 warmup_steps: 2
 
-mix_precision: 32
+mix_precision: bf16
+gradient_clip_val: 0.5
 gpu_devices: 1
 profiler: simple
 
@@ -29,7 +30,7 @@ scheduler:
   warmup_prefix: True
 
 dataloader:
-  num_workers: 4
+  num_workers: 6
 
 loss:
   type: aam # [aam, ce]
