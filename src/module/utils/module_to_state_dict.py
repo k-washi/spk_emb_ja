@@ -7,14 +7,31 @@ from src.utils.conf import get_hydra_cnf
 def convert_checkpoint_to_st(input_path, output_path, hidden_size):
     cfg = get_hydra_cnf("src/conf", "config")
     cfg.model.ecapa_tdnn.hidden_size = hidden_size
-    model = EcapaTdnnModelModule.load_from_checkpoint(input_path, cfg=cfg, strict=False)
+    model = EcapaTdnnModelModule(cfg=cfg)
+    state_dict = torch.load(input_path)["state_dict"]
+    print(model.model)
+    
+    class TmpModel(torch.nn.Module):
+        def __init__(self):
+            super(TmpModel, self).__init__()
+            self.model = None
+    tmp_model = TmpModel()
+    tmp_model.model = ECAPA_TDNN(
+        cfg.model.ecapa_tdnn.channel_size,
+        hidden_size,
+        use_layer7=False
+    )
+    
+    tmp_model.load_state_dict(state_dict, strict=False)
+    
     
     Path(output_path).parent.mkdir(exist_ok=True, parents=True)
-    torch.save(model.model.state_dict(), output_path)
+    torch.save(tmp_model.model.state_dict(), output_path)
     
     model = ECAPA_TDNN(
         cfg.model.ecapa_tdnn.channel_size,
-        cfg.model.ecapa_tdnn.hidden_size
+        hidden_size,
+        use_layer7=False
     )
     model.load_state_dict(torch.load(output_path))
     

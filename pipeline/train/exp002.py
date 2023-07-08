@@ -78,7 +78,7 @@ def train(cfg: DictConfig):
     # モデル保存
     checkpoint_callback = ModelCheckpoint(
         dirpath=MODEL_SAVE_DIR,
-        filename="checkpoint-{epoch:04d}-{train_acc:.4f}",
+        filename="checkpoint-{epoch:04d}-{val_eer:.4f}",
         save_top_k=cfg.ml.model_save.top_k,
         monitor=cfg.ml.model_save.monitor,
         mode=cfg.ml.model_save.mode

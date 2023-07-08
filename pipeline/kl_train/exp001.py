@@ -18,13 +18,13 @@ logger = get_logger(debug=True)
 # PARAMS #
 ##########
 
-EXP_ID = "0023"
+EXP_ID = "0028"
 LOG_SAVE_DIR = f"logs/kl_{EXP_ID}"
 MODEL_SAVE_DIR = f"checkpoints/kl_{EXP_ID}"
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
-TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset"]
+TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/jtube"]
 
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
@@ -33,15 +33,13 @@ NUM_EPOCHS = 1000
 BATCH_SIZE = 128
 SCHEDULER_T_INITIAL = 10
 
-AUGMENT_TIME_STRETCH_PARAMS = [0.95, 1.05, 0.5]
+AUGMENT_TIME_STRETCH_PARAMS = [0.975, 1.025, 0.5]
 
 # MODEL PARAMS
-HIDDEN_SIZE = 128
-USE_LAYER_7 = True
+HIDDEN_SIZE = 512
+KL_BETA = 1
 
-LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}_kl"
-if not USE_LAYER_7:
-    LOG_NAME = LOG_NAME + "_no_layer7"
+LOG_NAME = f"jvs_adan_aam_h{int(HIDDEN_SIZE)}_b{int(BATCH_SIZE)}_e{int(NUM_EPOCHS)}_s{int(SCHEDULER_T_INITIAL)}_kl_{EXP_ID}"
 
 logger.info(f"LOG_NAME: {LOG_NAME}")
 
@@ -59,7 +57,7 @@ def train(cfg: DictConfig):
     cfg.ml.batch_size = BATCH_SIZE
     cfg.ml.scheduler.t_initial = SCHEDULER_T_INITIAL
     cfg.model.ecapa_tdnn.hidden_size = HIDDEN_SIZE
-    cfg.model.ecapa_tdnn.use_layer7 = USE_LAYER_7
+    cfg.model.ecapa_tdnn.kl_beta = KL_BETA
     cfg.dataset.augment.time_stretch_params = AUGMENT_TIME_STRETCH_PARAMS
 
     logger.info(cfg)

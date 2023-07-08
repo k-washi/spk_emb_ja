@@ -26,7 +26,7 @@ PRETRAINED_MODEL = "/workspace/checkpoints/00008/checkpoint-epoch=0111-train_acc
 
 
 #TRAIN_DATASET_LIST =  ["/data/jvs_vc"] 
-TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset"]
+TRAIN_DATASET_LIST =  ["/data/jvs_vc", "/data/common_voice", "/data/lecture_vc", "/data/vc_dataset", "/data/jtube"]
 
 FAST_DEV_RUN = False # 確認用の実行を行うか
 
