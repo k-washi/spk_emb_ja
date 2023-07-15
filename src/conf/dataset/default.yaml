@@ -16,5 +16,7 @@ augment:
   musan_dir_path: /data/musan
   rir_dir_path: /data/riris_noises
   time_stretch_params: [0.8, 1.2, 0.5]
+  volume_mul_params: [0,1, 0.25, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
+  volume_aug_rate: 0.8
   freq_mask_width: [0, 8]
   time_mask_width: [0, 10]

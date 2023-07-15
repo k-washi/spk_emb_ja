@@ -10,6 +10,7 @@ from scipy import signal
 from src.utils.audio import load_wave
 
 from audiomentations import Compose, TimeStretch
+from src.dataset.augments.volume import VolumeAugment
 
 class VoiceDataset(Dataset):
     def __init__(self, 
@@ -21,6 +22,8 @@ class VoiceDataset(Dataset):
                 musan_path: str = "/data/musan",
                 rir_path: str = "/data/riris_noises",
                 time_stretch_params: Tuple[float, float, float] = (0.8, 1.2, 0.5),
+                volume_mul_params: List = [0,1, 0.25, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95],
+                volume_aug_rate: float = 0.8,
                 is_audio_file_only: bool = False,
         ):
         """音声とラベルと返すデータセット
@@ -42,7 +45,13 @@ class VoiceDataset(Dataset):
         self.is_audio_file_only = is_audio_file_only
         self.use_noise = use_noise
         
-        self.__aug_setup(musan_path, rir_path, time_stretch_params)
+        self.__aug_setup(
+            musan_path, 
+            rir_path, 
+            time_stretch_params,
+            volume_mul_params,
+            volume_aug_rate
+        )
     
     def __len__(self):
         return len(self.audio_file_list)
@@ -57,6 +66,11 @@ class VoiceDataset(Dataset):
             try:
                 label, audio_file = self.audio_file_list[idx]
                 waveform, _ = load_wave(audio_file, sample_rate=self.sample_rate, is_torch=False, mono=True)
+                if np.abs(waveform).max() <= 0:
+                    break
+                if self.is_aug:
+                    waveform = self.waveform_aug(waveform, sample_rate=self.sample_rate)
+                    waveform = self.volume_aug(waveform)
                 break
             except Exception as e:
                 print(e)
@@ -64,10 +78,8 @@ class VoiceDataset(Dataset):
                 add_index += 1
                 continue
         
-        # waveform aug (time stretch)
-        if self.is_aug:
-            waveform = self.waveform_aug(waveform, sample_rate=self.sample_rate)
-        
+        # waveform aug (time stretch, volume)
+
         # waveformをlengthで切り出す
         if waveform.shape[0] <= self.waveform_length:
             shortage = self.waveform_length - waveform.shape[0]
@@ -81,12 +93,24 @@ class VoiceDataset(Dataset):
             waveform = self._augment(waveform)
         return torch.FloatTensor(waveform[0]), label, audio_file
     
-    def __aug_setup(self, musan_path, rir_path, time_stretch_params):
+    def __aug_setup(
+        self, 
+        musan_path, 
+        rir_path, 
+        time_stretch_params,
+        volume_mul_params,
+        volume_aug_rate,
+    ):
         if not self.is_aug:
             return
         self.waveform_aug = Compose([
             TimeStretch(min_rate=time_stretch_params[0], max_rate=time_stretch_params[1], p=time_stretch_params[2])
         ])
+        
+        self.volume_aug = VolumeAugment(
+            volume_mul_params,
+            volume_aug_rate
+        )
         
         if self.use_noise:
             # Musan: Load and configure augmentation files

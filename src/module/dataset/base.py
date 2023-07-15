@@ -26,6 +26,8 @@ class VoiceDataModule(LightningDataModule):
         self._musan_path = cfg.dataset.augment.musan_dir_path
         self._rir_path = cfg.dataset.augment.rir_dir_path
         self._time_stretch_aug_params = cfg.dataset.augment.time_stretch_params
+        self._volume_mul_params = cfg.dataset.augment.volume_mul_params
+        self._volume_aug_rate = cfg.dataset.augment.volume_aug_rate
         
         self._batch_size = cfg.ml.batch_size
         self._num_workers = cfg.ml.dataloader.num_workers
@@ -44,6 +46,8 @@ class VoiceDataModule(LightningDataModule):
             musan_path=self._musan_path,
             rir_path=self._rir_path,
             time_stretch_params=self._time_stretch_aug_params,
+            volume_mul_params=self._volume_mul_params,
+            volume_aug_rate=self._volume_aug_rate,
             is_audio_file_only=False
         )
         
